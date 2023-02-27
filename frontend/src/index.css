@@ -106,7 +106,10 @@ input , textarea{
   border: 1px solid #050116 !important;
   box-shadow: none !important;
 }
-
+.bell{
+  max-width: fit-content !important;
+  height: 100% !important;
+}
 .ant-message{
   z-index: 9999 !important;
 }
@@ -115,16 +118,20 @@ input , textarea{
 }
 
 .login{
-  background-image: url("https://www.itprotoday.com/sites/itprotoday.com/files/styles/article_featured_retina/public/software-developer_0.jpg?itok=j19BgY7S") ;
   height: 100vh !important;
+  background-color: #160938 !important;
 }
 .login-form{
   background-color: rgb(255, 255, 255) !important;
 }
-
+.reg{
+  background-color: aqua !important;
+  width: 100% !important;
+}
 .register{
-  background-image:url("https://www.itprotoday.com/sites/itprotoday.com/files/styles/article_featured_retina/public/software-developer_0.jpg?itok=j19BgY7S") ;
+  /* background-image:url("https://www.itprotoday.com/sites/itprotoday.com/files/styles/article_featured_retina/public/software-developer_0.jpg?itok=j19BgY7S") ; */
   height: 100vh !important;
+  background-color: #160938 !important;
 }
 .register-form{
   background-color: white !important;

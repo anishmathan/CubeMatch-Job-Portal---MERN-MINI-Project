@@ -4,6 +4,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { getAllJobs } from "../redux/actions/jobActions.";
 import { Row, Col , Button } from "antd";
 import { Link } from "react-router-dom";
+import {
+  LikeOutlined
+} from '@ant-design/icons';
 import moment from "moment";
 function Home() {
   const { jobs } = useSelector((state) => state.jobsReducer);
@@ -17,8 +20,8 @@ function Home() {
       <DefaultLayout> 
         <Row gutter={16}> 
           {jobs.map((job) => {
-           return <Col lg={12} sm={24}>
-                <div className="job-div bs m-2 p-2">
+           return <Col lg={12} sm={24} > 
+                <div className="job-div bs m-2 p-2">  <LikeOutlined />
                    <h4>{job.title}</h4>
                    <p>{job.company}</p>
                    <hr />

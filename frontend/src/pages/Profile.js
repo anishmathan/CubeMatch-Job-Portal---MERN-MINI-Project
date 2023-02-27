@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import DefaultLayout from "../components/DefaultLayout";
-import { Row, Col, Form, Tabs, Input, Button, Upload , message} from "antd";
+import { Row, Col, Form, Tabs, Input, Button, Upload, message } from "antd";
 import {
   UploadOutlined,
 } from "@ant-design/icons";
@@ -10,80 +10,74 @@ import axios from "axios";
 const { TextArea } = Input;
 const { TabPane } = Tabs;
 
-// const props = {
-//   name: 'file',
-//   action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-//   headers: {
-//     authorization: 'authorization-text',
-//   },
-// }
 
 function Profile() {
 
   const [personalInfo, setPersonalInfo] = useState();
   const [activeTab, setActiveTab] = useState("1");
   const dispatch = useDispatch()
-  const id = JSON.parse(localStorage.getItem('user'))
-  
-    const [firstName,setFirstName]=useState('');
-    const [lastName,setLastName]=useState('');
-    const [email,setEmail]=useState('');
-    const [mobileNumber,setMobileNumber]=useState('');
-    const [portfolio,setPortfolio]=useState('');
-    const [resume,setResume]=useState('');
-    const [about,setAbout]=useState('');
-    const [address,setAddress]=useState('');
-    const [education,setEducation]=useState('');
-    const [skills,setSkills]=useState('');
-    const [projects,setProjects]=useState('');
-    const [experience,setExperience]=useState('');
-   
-  
-    // console.log("id" , id._id)
-   console.log(resume);
-const resumeupload =async(e)=>{
-    e.preventDefault();
-    const users=new FormData();
-    users.append("firstName",firstName);
-    users.append("lastName",lastName);
-    users.append("email",email); 
-    users.append("mobileNumber",mobileNumber);
-    users.append("portfolio",portfolio);
-    users.append("resume",resume);
-    users.append("about",about);
-    users.append("address",address);
-    users.append("education",education);
-    users.append("skills",skills);
-    users.append("projects",projects);
-    users.append("experience",experience);
+  // const id = JSON.parse(localStorage.getItem('user'))
 
-    
-    
-    try{
-        const response=await axios.put(`http://localhost:4000/api/users/update/${id._id}` ,users)
-        if(response.status == '200'){
-            setFirstName('');
-            setLastName('');
-            setEmail('');
-            setMobileNumber('');
-            setPortfolio('');
-            setResume('');
-            setAbout('');
-            setAddress('');
-            setEducation('');
-            setSkills('');
-            setProjects('');
-            setExperience('');
-            message.success("Updated success");
-          
-        }
-    }catch(error){
-        if(error.response.data.status =='404')
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [portfolio, setPortfolio] = useState('');
+  const [resume, setResume] = useState('');
+  const [doc, setDoc] = useState('');
+  const [about, setAbout] = useState('');
+  const [address, setAddress] = useState('');
+  const [education, setEducation] = useState('');
+  const [skills, setSkills] = useState('');
+  const [projects, setProjects] = useState('');
+  const [experience, setExperience] = useState('');
+
+
+  const resumeupload = async (e) => {
+    e.preventDefault();
+    const users = new FormData();
+    users.append("firstName", firstName);
+    users.append("lastName", lastName);
+    users.append("email", email);
+    users.append("mobileNumber", mobileNumber);
+    users.append("portfolio", portfolio);
+    users.append("resume", resume);
+    users.append("about", about);
+    users.append("address", address);
+    users.append("education", education);
+    users.append("skills", skills);
+    users.append("projects", projects);
+    users.append("experience", experience);
+
+
+
+
+    try {
+      const response = await axios.post(`http://localhost:4000/api/users/update/${user._id}`, users)
+      if (response.status == '200') {
+        setFirstName('');
+        setLastName('');
+        setEmail('');
+        setMobileNumber('');
+        setPortfolio('');
+        setResume('');
+
+        setAbout('');
+        setAddress('');
+        setEducation('');
+        setSkills('');
+        setProjects('');
+        setExperience('');
+        message.success("Updated success");
+
+      }
+    } catch (error) {
+      if (error.response.data.status == '404')
         alert("not updated");
     }
-}
+  }
 
-  
+
   function onPersonInfoSubmit(values) {
     setPersonalInfo(values);
     console.log(values);
@@ -103,14 +97,19 @@ const resumeupload =async(e)=>{
 
 
   }
-  const user = JSON.parse(localStorage.getItem('user'))
+  const user = JSON.parse(localStorage.getItem('user'));
+  const resumeName = user.resume.split("/");
+  const userid = JSON.parse(localStorage.getItem("user"))._id;
+
+  // Pass the file name as a prop to the EditForm component
+
   return (
-    
+
     <div>
       <DefaultLayout>
         <Tabs defaultActiveKey="1" activeKey={activeTab}>
           <TabPane tab="Personal Info" key="1">
-            <Form layout="vertical" onFinish={onPersonInfoSubmit} initialValues={id}>
+            <Form layout="vertical" onFinish={onPersonInfoSubmit} initialValues={user}>
               <Row gutter={16}>
                 <Col lg={8} sm={24}>
                   <Form.Item
@@ -118,7 +117,7 @@ const resumeupload =async(e)=>{
                     required
                     rules={[{ required: true }]}
                     name="firstName"
-                    onChange={(e)=>setFirstName(e.target.value)}value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)} value={firstName}
                   >
                     <Input />
                   </Form.Item>
@@ -129,7 +128,7 @@ const resumeupload =async(e)=>{
                     required
                     rules={[{ required: true }]}
                     name="lastName"
-                    onChange={(e)=>setLastName(e.target.value)}value={lastName}
+                    onChange={(e) => setLastName(e.target.value)} value={lastName}
                   >
                     <Input />
                   </Form.Item>
@@ -140,7 +139,7 @@ const resumeupload =async(e)=>{
                     required
                     rules={[{ required: true }]}
                     name="email"
-                    onChange={(e)=>setEmail(e.target.value)}value={email}
+                    onChange={(e) => setEmail(e.target.value)} value={email}
                   >
                     <Input />
                   </Form.Item>
@@ -151,7 +150,7 @@ const resumeupload =async(e)=>{
                     required
                     rules={[{ required: true }]}
                     name="mobileNumber"
-                    onChange={(e)=>setMobileNumber(e.target.value)}value={mobileNumber}
+                    onChange={(e) => setMobileNumber(e.target.value)} value={mobileNumber}
                   >
                     <Input />
                   </Form.Item>
@@ -163,7 +162,7 @@ const resumeupload =async(e)=>{
                     required
                     rules={[{ required: true }]}
                     name="portfolio"
-                    onChange={(e)=>setPortfolio(e.target.value)}value={portfolio}
+                    onChange={(e) => setPortfolio(e.target.value)} value={portfolio}
                   >
                     <Input />
                   </Form.Item>
@@ -176,18 +175,22 @@ const resumeupload =async(e)=>{
                     name="resume"
                     label="Upload Resume Here"
                     type="file"
-                    // value={resume}
-                    onChange={(e)=>setResume(e.target.files[0])}
+                    onChange={(e) => setResume(e.target.files[0])}
                   >
                     <Upload
+                      fileName={resume}
                       beforeUpload={(file) => {
                         console.log(file);
                         return false;
                       }}
-
                     >
+
                       <Button icon={<UploadOutlined />}>Click to Upload</Button>
                     </Upload>
+                    <a href={user.resume} target="_blank" rel="noreferrer">
+                      View File
+                    </a>
+                    <p name="resume">{resumeName[4]}</p>
                   </Form.Item>
                 </Col>
                 <Col lg={24} sm={24}>
@@ -196,7 +199,7 @@ const resumeupload =async(e)=>{
                     required
                     rules={[{ required: true }]}
                     name="about"
-                    onChange={(e)=>setAbout(e.target.value)}value={about}
+                    onChange={(e) => setAbout(e.target.value)} value={about}
                   >
                     <TextArea rows={4} />
                   </Form.Item>
@@ -207,7 +210,7 @@ const resumeupload =async(e)=>{
                     required
                     rules={[{ required: true }]}
                     name="address"
-                    onChange={(e)=>setAddress(e.target.value)}value={address}
+                    onChange={(e) => setAddress(e.target.value)} value={address}
                   >
                     <TextArea rows={4} />
                   </Form.Item>
@@ -231,7 +234,7 @@ const resumeupload =async(e)=>{
                               label="Education"
                               style={{ width: "80%" }}
                               rules={[{ required: true }]}
-                              onChange={(e)=>setEducation(e.target.value)}value={education}
+                              onChange={(e) => setEducation(e.target.value)} value={education}
                             >
                               <TextArea rows={4} />
                             </Form.Item>
@@ -256,7 +259,7 @@ const resumeupload =async(e)=>{
                               label="Skill"
                               style={{ width: "80%" }}
                               rules={[{ required: true }]}
-                              onChange={(e)=>setSkills(e.target.value)}value={skills}
+                              onChange={(e) => setSkills(e.target.value)} value={skills}
                             >
                               <TextArea rows={4} />
                             </Form.Item>
@@ -281,7 +284,7 @@ const resumeupload =async(e)=>{
                               label="Project"
                               style={{ width: "80%" }}
                               rules={[{ required: true }]}
-                              onChange={(e)=>setProjects(e.target.value)}value={projects}
+                              onChange={(e) => setProjects(e.target.value)} value={projects}
                             >
                               <TextArea rows={4} />
                             </Form.Item>
@@ -305,7 +308,7 @@ const resumeupload =async(e)=>{
                               label="Experience"
                               style={{ width: "80%" }}
                               rules={[{ required: true }]}
-                              onChange={(e)=>setExperience(e.target.value)}value={experience}
+                              onChange={(e) => setExperience(e.target.value)} value={experience}
                             >
                               <TextArea rows={4} />
                             </Form.Item>

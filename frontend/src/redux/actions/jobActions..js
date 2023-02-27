@@ -4,14 +4,11 @@ import axios from "axios";
 
 
 export const getAllJobs = () => async (dispatch) => {
-  dispatch({ type: "LOADING", payload: true });
   try {
     const response = await axios.get("/api/jobs/getalljobs");
     dispatch({ type: "GET_ALL_JOBS", payload: response.data });
-    dispatch({ type: "LOADING", payload: false });
   } catch (error) {
     console.log(error);
-    dispatch({ type: "LOADING", payload: false });
   }
 };
 
@@ -51,6 +48,37 @@ export const editJob = (values) => async (dispatch) => {
   }
 };
 
+export const count = (values) => async (dispatch) => {
+  try {
+    const response = await axios.get(`/api/jobs/notifications`, values);
+    dispatch({ type: "LOADING", payload: false });
+    message.success("Job Deleted Successfully");
+
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 1000);
+  } catch (error) {
+    console.log(error);
+    dispatch({ type: "LOADING", payload: false });
+  }
+};
+export const deleteJob = (job) => async (dispatch) => {
+  try {
+    const response = await axios.delete("http://localhost:4000/api/jobs/deletejob/:id");
+
+    dispatch({ type: "LOADING", payload: false });
+    message.success("Job Deleted Successfully");
+
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 1000);
+  } catch (error) {
+    console.log(error);
+    dispatch({ type: "LOADING", payload: false });
+  }
+};
+
+
 
 export const applyJob = (job) => async (dispatch) => {
 
@@ -60,17 +88,19 @@ export const applyJob = (job) => async (dispatch) => {
   dispatch({ type: "LOADING", payload: true });
   try {
     const response = await axios.post("/api/jobs/applyjob", {job , user});
-
+   
     dispatch({ type: "LOADING", payload: false });
     message.success("Job applied Successfully");
-
+    const responses = await axios.post ("api/users/confirmationmail")
     setTimeout(() => {
       window.location.href = "/";
     }, 1000);
+    responses();
   } catch (error) {
     console.log(error);
     dispatch({ type: "LOADING", payload: false });
   }
+    
 };
 
 

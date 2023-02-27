@@ -1,26 +1,23 @@
 import React from "react";
 import { Row, Col, Form, Input, Button } from "antd";
-import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 import { loginUser } from "../redux/actions/userActions";
 import { useDispatch } from "react-redux";
 import { Link, Navigate } from "react-router-dom";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import UserHome from "../userPages/UserHome";
-
+import { message } from "antd";
 AOS.init();
 
-  
 
-function Login  () {
-  
-    const dispatch = useDispatch()
-    function login(values){
 
-        dispatch(loginUser(values))
+function Login() {
 
-    }
-    
+  const dispatch = useDispatch()
+  function login(values) {
+
+    dispatch(loginUser(values))
+  }
+
   return (
     <div className="login">
       <Row justify="center" className="flex align-items-center">
@@ -33,7 +30,7 @@ function Login  () {
               label="username"
               name="username"
               rules={[{ required: true }]}
-             
+
             >
               <Input />
             </Form.Item>
@@ -43,17 +40,17 @@ function Login  () {
               name="password"
               rules={[{ required: true }]}
             >
-               <Input.Password
-            iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-          /> 
+              <Input
+              />
             </Form.Item>
 
             <Button htmlType="submit" className='mb-3'> Login</Button><br />
 
             <Link to='/register' className='mt-3'>Click here to register</Link>
-            <hr/>
-            {/* <Link to='/candilog' className='mt-3'>Click Here to Candidate Login</Link> */}
-            <Link to='/register' className='mt-3'> Forgot Password?</Link>
+            <hr />
+            <Link to="/forgotpassword" className="login-screen__forgotpassword">
+              Forgot Password?
+            </Link>
           </Form>
         </Col>
         <Col lg={5}><h1 className='heading2' data-aos='slide-right'>claritaz</h1></Col>

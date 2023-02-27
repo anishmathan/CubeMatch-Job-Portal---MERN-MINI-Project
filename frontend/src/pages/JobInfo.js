@@ -23,6 +23,7 @@ function JobInfo({ match }) {
 
   function applyNow() {
     dispatch(applyJob(job));
+    
   }
 
   return (

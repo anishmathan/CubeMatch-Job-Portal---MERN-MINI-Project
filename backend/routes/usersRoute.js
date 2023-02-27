@@ -1,13 +1,43 @@
-require("dotenv").config();
 const express = require("express");
 const router = express.Router();
 const User = require("../models/userModel");
-const path = require('path');
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const auth = require("../middleware/auth");
 require("dotenv").config();
-const multer = require ('multer');
+const multer = require('multer');
+const fs = require('fs')
+const crypto = require("crypto");
+const ErrorResponse = require("../utils/errorResponse");
+const sendEmail = require("../utils/sendEmail");
+const confirmationMail = require("../utils/ConfirmationMail")
+
+// router.post("/register", async (req, res) => {
+//   try {
+//     const newuser = new User(req.body);
+//     const user = await newuser.save();
+//     res.send("User Created Successfully");
+//   } catch (error) {
+//     return res.status(400).json(error);
+//   }
+// });
+
+// router.post("/login", async (req, res) => {
+//   try {
+//     const user = await User.findOne({
+//       username: req.body.username,
+//       password: req.body.password,
+//     });
+//     if (user) {
+//       res.send(user);
+//     } else {
+//       return res.status(400).json({ message: "invalid credentials" });
+//     }
+//   } catch (error) {
+//     return res.status(400).json(error);
+//   }
+// });
+
+
 
 
 router.use(express.json({ limit: "50mb" }));
@@ -17,7 +47,7 @@ router.post("/register", async (req, res) => {
     const { username, password } = req.body;
 
     // Validate user input
-    if (!(username && password )) {
+    if (!(username && password)) {
       res.status(400).send("All input is required");
     }
 
@@ -35,7 +65,7 @@ router.post("/register", async (req, res) => {
 
     // Create user in our database
     const user = await User.create({
-      username: username.toLowerCase(), 
+      username: username.toLowerCase(),
       password: encryptedPassword,
     });
 
@@ -61,6 +91,7 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
+    console.log('LOgin');
     // Get user input
     const { username, password } = req.body;
 
@@ -76,7 +107,6 @@ router.post("/login", async (req, res) => {
       const token = jwt.sign(
         { user_id: user._id, username },
         process.env.JWT_KEY,
-
         {
           expiresIn: "2h",
         }
@@ -88,11 +118,13 @@ router.post("/login", async (req, res) => {
       // user
       res.status(200).json(user);
     }
-    res.status(400).send("Invalid Credentials");
+    // res.status(400).send("Invalid Credentials");
   } catch (err) {
     console.log(err);
   }
 });
+// /******************************************************* */
+
 
 
 const DIR = 'public';
@@ -100,15 +132,14 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, DIR);
   },
-  filename: (req, file, cb) => {
-    const fileName = file.originalname.toLowerCase().split(' ').join('-');
-    cb(null,  fileName)
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + file.originalname);
   }
 });
 var upload = multer({
   storage: storage,
   fileFilter: (req, file, cb) => {
-    if (file.mimetype == "application/pdf" || file.mimetype == "image/png" || file.mimetype == "image/jpeg") {
+    if (file.mimetype == "application/pdf" || file.mimetype == "image/png" || file.mimetype == "image/jpeg" || file.mimetype == "application/msword") {
       cb(null, true);
     } else {
       cb(null, false);
@@ -117,102 +148,204 @@ var upload = multer({
   }
 });
 var type = upload.single('resume')
-router.put("/update/:id",type,async (req, res) => { 
-  console.log(req.file);             
+router.post("/update/:id", type, async (req, res) => {
+  const remove = (req, res) => {
+    const fileName = req.params.name;
+    if (file !== undefined && file !== null && file.filename);
+    const directoryPath = __basedir + "/public";
+    router.delete("/files/:name", remove);
+    fs.unlink(directoryPath + fileName, (err) => {
+      if (err) {
+        res.status(500).send({
+          message: "Could not delete the file. " + err,
+        });
+      }
+
+      res.status(200).send({
+        message: "File is deleted.",
+      });
+    });
+  };
+
+  // const delResume =async()=>{
+  const filePath = await User.findOne({ _id: req.params.id });
+  const path = filePath.resume.split('/')
+  console.log("path:", path)
+  // }
+  // /home/ctl/Downloads/anish-project-1-main/backend/public/1674193300167RESUME.pdf
+  fs.unlink(`/home/ctl/Downloads/anish-project-1-main/backend/public/${path[4]}`, function (err) {
+    if (err) console.log('Err: ', err.message);
+    else console.log('File deleted!');
+  });
+
+  console.log(req.file);
   const url = req.protocol + '://' + req.get('host')
   User.findOneAndUpdate({ _id: req.params.id }, {
     $set: {
-      firstName : req.body.firstName,
-      lastName : req.body.lastName,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
 
-      email : req.body.email,
-      mobileNumber : req.body.mobileNumber,
-      portfolio : req.body.portfolio,
-      resume : url +"/public/" + req.file.Filename,
-      about : req.body.about,
-      address : req.body.address,
-      education : req.body.education,
-      skills : req.body.skill,
-      projects : req.body.projects,
-      experience : req.body.experience
-    
+      email: req.body.email,
+      mobileNumber: req.body.mobileNumber,
+      portfolio: req.body.portfolio,
+      resume: url + "/public/" + req.file.filename,
+      about: req.body.about,
+      address: req.body.address,
+      education: req.body.education,
+      skills: req.body.skill,
+      projects: req.body.projects,
+      experience: req.body.experience
+
     }
   }, function (err, data) {
-    if (err){
+    if (err) {
       res.status(500).send(err)
-  } else {
-    res.status(200).send({message: 'UPDATED', data: data})
-  }
+    } else {
+      res.status(200).send({ message: 'UPDATED', data: data })
+    }
   })
+
+
 })
 
-router.get('/download/:id', async (req, res) => {
-  const down = req.params.id;
-  res.status(200).json('Download Completed');
+// @desc    Forgot Password Initialization
+router.post("/forgotPassword", async (req, res, next) => {
+  // Send Email to email provided but first check if user exists
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return next(new ErrorResponse("No email could not be sent", 404));
+
+    }
+
+    // Reset Token Gen and add to database hashed (private) version of token
+    const resetToken = user.getResetPasswordToken();
+
+    await user.save();
+
+    // Create reset url to email to provided email
+    const resetUrl = `http://localhost:3000/passwordreset/${resetToken}`;
+
+    // HTML Message
+    const message = `
+      <h1>You have requested a password reset</h1>
+      <p>Please make a put request to the following link:</p>
+      <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
+    `;
+
+    try {
+      await sendEmail({
+        to: user.email,
+        subject: "Password Reset Request",
+        text: message,
+      });
+
+      res.status(200).json({ success: true, data: "Email Sent" });
+    } catch (err) {
+      console.log(err);
+
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpire = undefined;
+
+      await user.save();
+
+      return next(new ErrorResponse("Email could not be sent", 500));
+    }
+  } catch (err) {
+    next(err);
+  }
 });
-// var type = upload.single('resume')
-// router.post('/update/:id',type, async (req, res) => {
-//   const url = req.protocol + '://' + req.get('host')
-//   console.log( "data: ", req.body);
-//   const data = new userModal({
-//       username:req.body.username,
-//       password:req.body.password,
-//       firstName : req.body.firstName,
-//       lastName : req.body.lastName,
-//       email : req.body.email,
-//       mobileNumber : req.body.mobileNumber,
-//       portfolio : req.body.portfolio,
-//       resume : url + '/public/' + req.file.filename,
-//       about : req.body.about,
-//       address : req.body.address,
-//       education : req.body.education,
-//       skills : req.body.skill,
-//       projects : req.body.projects,
-//       experience : req.body.experience
-    
-//   })
-  //  await data.save()
 
-  //  try {
-  //   const userModal = new User (req.body);
-  //   const user = await data.save();
-  //   res.send("User Created Successfully");
-  // } catch (error) {
-  //   return res.status(400).json(error);
-  // }
-  // try {
-  //        const user =  await userModal.findByIdAndUpdate({ _id: req.params.id},{$set:data});
-    
-  //       // const user = await userModal.updateOne({ id: req.params._id });
-    
-  //       res.send(user);
-  //     } catch (error) { console.log("error" , error)
-  //       return res.status(400).json({   err: error.message });
-  //     }
-  
+// @desc    Reset User Password
+router.post("/resetPassword/:resetToken", async (req, res, next) => {
+  // Compare token in URL params to hashed token
+  const resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(req.params.resetToken)
+    .digest("hex");
+
+  try {
+    const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return next(new ErrorResponse("Invalid Token", 400));
+    }
+
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    res.status(201).json({
+      success: true,
+      data: "Password Updated Success",
+      token: user.getSignedJwtToken(),
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/getallusers", async (req, res) => {
+
+  try {
+    const users = await User.find()
+    res.send(users)
+  } catch (error) {
+    return res.status(400).json({ error });
+  }
+
+});
 
 
+
+
+
+
+router.post("/confirmationmail", async (req, res, next) => {
+
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return next(new ErrorResponse("No email could not be sent", 404));
+
+    }
+   
+    const message = 
+  `<h2>Dear{users.firstName}</h2>
+  <p>You HAve Successfully Applied Job in Cubematch- Claritaz job portal The HR of the company will Reach You Soon. BEST WISHES</p>`
+
+    try {
+      await confirmationMail({
+        to: user.email,
+        subject: "Confirmation Mail : You Have Successfully Applied Job in Cubematch Claritaz Job",
+        text: message,
+      });
+
+      res.status(200).json({ success: true, data: "Email Sent" });
+    } catch (err) {
+      console.log(err);
+
+      await user.save();
+
+      return next(new ErrorResponse("Email could not be sent", 500));
+    }
+  } catch (err) {
+    next(err);
+  }
+});
 
 module.exports = router;
-
-
-// router.post("/update", async (req, res) => {
-//   try {
-//     await User.findOneAndUpdate({ _id: req.body._id }, req.body);
-
-//     const user = await User.findOne({ _id: req.body._id });
-
-//     res.send(user);
-//   } catch (error) {
-//     return res.status(400).json({ error });
-//   }
-// });
-
-
-
-
-
-
 
 
 
@@ -312,7 +445,7 @@ module.exports = router;
 //   try {
 //     console.log("success ",req.file.filename)
 //     const url = req.protocol + "://" + req.get("host");
-  
+
 //     const imgpath = url + "/public/uploads" + req.file.filename;
 //     console.log("imgpath", imgpath)
 
@@ -359,17 +492,6 @@ module.exports = router;
 // });
 
 
-// router.get("/getallusers", async (req, res) => {
-
-//   try {
-//     const users = await User.find()
-//     res.send(users)
-//   } catch (error) {
-//     return res.status(400).json({ error });
-//   }
-
-// });
-
 
 
 // // Single file
@@ -377,6 +499,3 @@ module.exports = router;
 //   console.log(req.file)
 //   return res.send("Single file")
 // })
-
-
-module.exports = router;

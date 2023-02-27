@@ -5,49 +5,46 @@ function UserInfo({ match }) {
   const { users } = useSelector((state) => state.usersReducer);
 
   const user = users.find((user) => user._id == match.params.id);
-  const id = JSON.parse(localStorage.getItem('user'))
-// console.log("user:", id)
   return (
     <div>
       <DefaultLayout>
-        <div>
-        <h3>
+        {user && (
+          <div>
+            <h3>
               <b>Personal inforamtion</b>
             </h3>
             <p>
               <b>First name : </b>
-              {id.firstName}
+              {user.firstName}
             </p>
             <p>
-            <b>Last name : </b>
-              {id.lastName}
+              <b>Last name : </b>
+              {user.lastName}
             </p>
             <p>
               <b>Email : </b>
-              {id.email}
+              {user.email}
             </p>
             <p>
               <b>Mobile Number : </b>
-              {id.mobileNumber}
+              {user.mobileNumber}
             </p>
             <p>
               <b>Address : </b>
-              {id.address}
+              {user.address}
             </p>
-
+            <button class="btn btn-primary">
+              <a href={user.resume} target="_blank" rel="noreferrer">
+                Download Resume
+              </a></button>
             <hr />
-            <h3>
-              <b>Skills</b>
-            </h3>
-            {id.skills.map((skills) => {
-              return <li>{skills}</li>;
-            })}
-            
+
+
             <hr />
             <h3>
               <b>Education</b>
             </h3>
-            {id.education.map((education) => {
+            {user.education.map((education) => {
               return <li>{education}</li>;
             })}
             <hr />
@@ -55,7 +52,7 @@ function UserInfo({ match }) {
             <h3>
               <b>Projects</b>
             </h3>
-            {id.projects.map((project) => {
+            {user.projects.map((project) => {
               return <li>{project}</li>;
             })}
 
@@ -63,22 +60,20 @@ function UserInfo({ match }) {
             <h3>
               <b>Experience</b>
             </h3>
-            {id.experience.map((experience) => {
+            {user.experience.map((experience) => {
               return <li>{experience}</li>;
             })}
-            <h3>
-              <b>Resume</b>
-            </h3>
-            <a href="http://localhost:4000/public/resume.pdf">
-                <button>Download</button>
-  </a> 
-            {/* {id.resume.map((resume) => {
-              return <li>{resume}</li>;
-            })} */}
-        </div>
 
-        
-        
+            <h3>
+              <b>Skills</b>
+            </h3>
+
+            {user.skills.map((skill) => {
+              return <li>{skill}</li>;
+            })}
+
+          </div>
+        )}
       </DefaultLayout>
     </div>
   );

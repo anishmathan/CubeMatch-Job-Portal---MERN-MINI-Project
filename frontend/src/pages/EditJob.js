@@ -7,6 +7,8 @@ import { editJob, postJob } from "../redux/actions/jobActions.";
 const { TextArea } = Input;
 const { TabPane } = Tabs;
 const { Option } = Select;
+
+
 function EditJob({match}) {
   const [jobInfo, setJobInfo] = useState({});
   const [activeTab, setActiveTab] = useState("0");
